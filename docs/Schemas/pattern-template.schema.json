@@ -1,0 +1,519 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://securityframework.dev/schemas/pattern-template.schema.json",
+  "title": "SecurityFramework Pattern Template",
+  "description": "JSON schema for pattern template files containing collections of threat patterns",
+  "type": "object",
+  "required": ["name", "version", "patterns"],
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 100,
+      "pattern": "^[a-zA-Z0-9\\s\\-_\\.]+$",
+      "description": "Human-readable template name"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Detailed description of the pattern template and its purpose"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9\\-]+)?$",
+      "description": "Template version using semantic versioning (e.g., 1.0.0, 2.1.3-beta)"
+    },
+    "author": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Template author or organization"
+    },
+    "license": {
+      "type": "string",
+      "maxLength": 50,
+      "description": "License under which the template is distributed (e.g., MIT, Apache-2.0)"
+    },
+    "homepage": {
+      "type": "string",
+      "format": "uri",
+      "description": "Homepage or documentation URL for the template"
+    },
+    "repository": {
+      "type": "string",
+      "format": "uri",
+      "description": "Source code repository URL"
+    },
+    "created": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Template creation timestamp"
+    },
+    "lastUpdated": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last update timestamp"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-zA-Z0-9\\-_]+$",
+        "maxLength": 50
+      },
+      "uniqueItems": true,
+      "maxItems": 20,
+      "description": "Tags for template categorization and discovery"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "SQLInjection",
+          "XSS",
+          "PathTraversal", 
+          "ParameterJacking",
+          "BotDetection",
+          "Bruteforce",
+          "RateLimitViolation",
+          "FileUpload",
+          "CommandInjection",
+          "DataExfiltration",
+          "PrivilegeEscalation",
+          "BusinessLogic",
+          "DataExposure",
+          "Custom"
+        ]
+      },
+      "uniqueItems": true,
+      "description": "Categories of threats covered by this template"
+    },
+    "targetIndustries": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["ecommerce", "banking", "healthcare", "government", "education", "saas", "gaming", "media", "general"]
+      },
+      "uniqueItems": true,
+      "description": "Industries where this template is most applicable"
+    },
+    "minimumFrameworkVersion": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+(\\.\\d+)?$",
+      "description": "Minimum SecurityFramework version required"
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/dependency"
+      },
+      "description": "External dependencies required by patterns in this template"
+    },
+    "configuration": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Template-specific configuration options",
+      "properties": {
+        "enableByDefault": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether patterns in this template should be enabled by default"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 50,
+          "description": "Template priority for conflict resolution"
+        },
+        "evaluationOrder": {
+          "type": "string",
+          "enum": ["sequential", "parallel", "priority"],
+          "default": "parallel",
+          "description": "How patterns in this template should be evaluated"
+        },
+        "globalThreatMultiplier": {
+          "type": "number",
+          "minimum": 0.1,
+          "maximum": 10,
+          "default": 1.0,
+          "description": "Global multiplier applied to all pattern threat scores in this template"
+        },
+        "maxConcurrentMatches": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "description": "Maximum number of patterns from this template that can match simultaneously"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Additional metadata about the template",
+      "properties": {
+        "maturityLevel": {
+          "type": "string",
+          "enum": ["experimental", "beta", "stable", "mature"],
+          "description": "Maturity level of the template"
+        },
+        "supportLevel": {
+          "type": "string",
+          "enum": ["community", "commercial", "enterprise"],
+          "description": "Support level available for this template"
+        },
+        "changelogUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to changelog or release notes"
+        },
+        "documentationUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to detailed documentation"
+        },
+        "supportUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL for support or issues"
+        },
+        "performanceProfile": {
+          "type": "object",
+          "properties": {
+            "averageMatchTime": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Average pattern matching time in milliseconds"
+            },
+            "memoryUsage": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Estimated memory usage in KB"
+            },
+            "cpuIntensive": {
+              "type": "boolean",
+              "description": "Whether patterns are CPU intensive"
+            }
+          }
+        },
+        "statistics": {
+          "type": "object",
+          "properties": {
+            "totalPatterns": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Total number of patterns in template"
+            },
+            "activePatterns": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of active patterns"
+            },
+            "averageThreatScore": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "Average threat score of patterns"
+            },
+            "falsePositiveRate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "Estimated overall false positive rate"
+            }
+          }
+        }
+      }
+    },
+    "patterns": {
+      "type": "array",
+      "items": {
+        "$ref": "threat-pattern.schema.json"
+      },
+      "minItems": 1,
+      "maxItems": 1000,
+      "description": "Array of threat patterns included in this template"
+    },
+    "patternGroups": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/patternGroup"
+      },
+      "description": "Logical groupings of patterns for organization and management"
+    },
+    "testSuites": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/testSuite"
+      },
+      "description": "Test suites for validating template functionality"
+    },
+    "examples": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/example"
+      },
+      "description": "Usage examples and integration guides"
+    }
+  },
+  "definitions": {
+    "dependency": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Dependency name"
+        },
+        "version": {
+          "type": "string",
+          "pattern": "^[>=<~^]?\\d+\\.\\d+(\\.\\d+)?.*$",
+          "description": "Version requirement (supports semver ranges)"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["framework", "library", "service", "data"],
+          "description": "Type of dependency"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Description of what this dependency provides"
+        },
+        "optional": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this dependency is optional"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL where dependency can be obtained"
+        }
+      }
+    },
+    "patternGroup": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "patterns"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Group name"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Group description"
+        },
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether this group is enabled by default"
+        },
+        "priority": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "description": "Group priority for evaluation order"
+        },
+        "patterns": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Pattern names included in this group"
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "conditions": {
+          "type": "object",
+          "description": "Conditions that apply to all patterns in this group",
+          "properties": {
+            "environment": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["development", "staging", "production", "testing"]
+              }
+            },
+            "applicationTypes": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["web", "api", "mobile", "desktop", "service"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "testSuite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "tests"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Test suite name"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Test suite description"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["unit", "integration", "performance", "security", "acceptance"],
+          "description": "Type of test suite"
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/test"
+          },
+          "minItems": 1
+        }
+      }
+    },
+    "test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "input", "expectedResult"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Test name"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "Test description"
+        },
+        "input": {
+          "type": "object",
+          "properties": {
+            "requestData": {"type": "string"},
+            "requestMethod": {"type": "string"},
+            "requestPath": {"type": "string"},
+            "headers": {"type": "object"},
+            "queryParameters": {"type": "object"}
+          },
+          "description": "Test input data"
+        },
+        "expectedResult": {
+          "type": "object",
+          "properties": {
+            "shouldMatch": {"type": "boolean"},
+            "matchingPatterns": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "expectedThreatScore": {"type": "number"},
+            "expectedAction": {
+              "type": "string",
+              "enum": ["allow", "monitor", "challenge", "restrict", "block"]
+            }
+          },
+          "description": "Expected test results"
+        },
+        "tags": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Test tags for categorization"
+        }
+      }
+    },
+    "example": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "description"],
+      "properties": {
+        "title": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Example title"
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 1000,
+          "description": "Example description"
+        },
+        "scenario": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Use case scenario"
+        },
+        "configuration": {
+          "type": "object",
+          "description": "Example configuration"
+        },
+        "code": {
+          "type": "object",
+          "properties": {
+            "language": {
+              "type": "string",
+              "enum": ["csharp", "json", "yaml", "javascript", "typescript", "bash"]
+            },
+            "content": {
+              "type": "string",
+              "description": "Code example content"
+            }
+          }
+        },
+        "expectedBehavior": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Expected behavior when using this example"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "name": "OWASP Top 10 2021 Patterns",
+      "description": "Comprehensive pattern set covering OWASP Top 10 vulnerabilities for 2021",
+      "version": "2021.1.0",
+      "author": "OWASP Community",
+      "license": "MIT",
+      "homepage": "https://owasp.org/",
+      "created": "2024-01-15T10:00:00Z",
+      "lastUpdated": "2024-01-15T10:00:00Z",
+      "tags": ["owasp", "top10", "web-security", "vulnerabilities"],
+      "categories": ["SQLInjection", "XSS", "PathTraversal", "DataExposure"],
+      "targetIndustries": ["general"],
+      "minimumFrameworkVersion": "1.0.0",
+      "configuration": {
+        "enableByDefault": true,
+        "priority": 80,
+        "evaluationOrder": "parallel",
+        "globalThreatMultiplier": 1.0
+      },
+      "metadata": {
+        "maturityLevel": "stable",
+        "supportLevel": "community",
+        "performanceProfile": {
+          "averageMatchTime": 2.5,
+          "memoryUsage": 512,
+          "cpuIntensive": false
+        }
+      },
+      "patterns": [],
+      "patternGroups": [
+        {
+          "name": "Injection Attacks",
+          "description": "Patterns for detecting various injection attacks",
+          "enabled": true,
+          "priority": 90,
+          "patterns": ["SQL Injection Basic", "NoSQL Injection", "LDAP Injection"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,1046 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://securityframework.dev/schemas/security-framework-config.schema.json",
+  "title": "SecurityFramework Configuration",
+  "description": "JSON schema for SecurityFramework configuration in appsettings.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "SecurityFramework": {
+      "$ref": "#/definitions/securityFrameworkOptions"
+    }
+  },
+  "definitions": {
+    "securityFrameworkOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableInMemoryStorage": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable in-memory storage for high performance IP tracking"
+        },
+        "EnableSQLitePersistence": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable SQLite persistence for data durability"
+        },
+        "SQLiteConnectionString": {
+          "type": "string",
+          "pattern": "^Data Source=.+;?.*$",
+          "description": "SQLite connection string (required if persistence enabled)"
+        },
+        "DefaultThreatThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 50,
+          "description": "Default threat threshold for blocking decisions (0-100)"
+        },
+        "MaxIPRecords": {
+          "type": "integer",
+          "minimum": 1000,
+          "maximum": 10000000,
+          "default": 1000000,
+          "description": "Maximum number of IP records to keep in memory"
+        },
+        "DataRetentionDays": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 365,
+          "default": 90,
+          "description": "Data retention period in days"
+        },
+        "IPSecurity": {
+          "$ref": "#/definitions/ipSecurityOptions"
+        },
+        "ParameterSecurity": {
+          "$ref": "#/definitions/parameterSecurityOptions"
+        },
+        "Patterns": {
+          "$ref": "#/definitions/patternOptions"
+        },
+        "RealTimeMonitoring": {
+          "$ref": "#/definitions/realTimeOptions"
+        },
+        "MachineLearning": {
+          "$ref": "#/definitions/mlOptions"
+        },
+        "Notifications": {
+          "$ref": "#/definitions/notificationOptions"
+        },
+        "Performance": {
+          "$ref": "#/definitions/performanceOptions"
+        }
+      }
+    },
+    "ipSecurityOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableBlocklist": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable IP blocklist functionality"
+        },
+        "AutoBlockEnabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable automatic IP blocking based on threat scores"
+        },
+        "AutoBlockThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 75,
+          "description": "Threat score threshold for automatic blocking (0-100)"
+        },
+        "AutoBlockDuration": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$|^\\d+\\.\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "24:00:00",
+          "description": "Duration for automatic blocks (HH:MM:SS or D.HH:MM:SS)"
+        },
+        "EnableGeoBlocking": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable geographic IP blocking"
+        },
+        "BlockedCountries": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$",
+            "description": "ISO 3166-1 alpha-2 country code"
+          },
+          "uniqueItems": true,
+          "description": "List of blocked country codes (ISO 3166-1 alpha-2)"
+        },
+        "AllowedCountries": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$"
+          },
+          "uniqueItems": true,
+          "description": "List of allowed country codes (if specified, only these are allowed)"
+        },
+        "BlockTorExitNodes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Block known Tor exit nodes"
+        },
+        "BlockHostingProviders": {
+          "type": "boolean",
+          "default": false,
+          "description": "Block known hosting/cloud provider IPs"
+        },
+        "AllowPrivateNetworks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow private network IPs (192.168.x.x, 10.x.x.x, etc.)"
+        },
+        "TrustedIPRanges": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\\/([0-9]|[1-2][0-9]|3[0-2]))?$"
+          },
+          "uniqueItems": true,
+          "description": "Trusted IP ranges that bypass all security checks (CIDR notation)"
+        },
+        "ExternalBlocklists": {
+          "$ref": "#/definitions/externalBlocklistOptions"
+        },
+        "RateLimit": {
+          "$ref": "#/definitions/rateLimitOptions"
+        }
+      }
+    },
+    "parameterSecurityOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableParameterJackingDetection": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable parameter jacking detection"
+        },
+        "TrackParameterPatterns": {
+          "type": "boolean",
+          "default": true,
+          "description": "Track parameter access patterns for analysis"
+        },
+        "DetectIDManipulation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Detect ID manipulation attempts"
+        },
+        "DetectPathTraversal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Detect path traversal in parameters"
+        },
+        "DetectSequentialAccess": {
+          "type": "boolean",
+          "default": true,
+          "description": "Detect sequential access patterns"
+        },
+        "SequentialAccessThreshold": {
+          "type": "integer",
+          "minimum": 3,
+          "maximum": 100,
+          "default": 5,
+          "description": "Number of sequential accesses to trigger detection"
+        },
+        "SequentialAccessWindow": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:05:00",
+          "description": "Time window for sequential access detection (HH:MM:SS)"
+        },
+        "MaxParameterAnomalyScore": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 50,
+          "description": "Maximum parameter anomaly score before blocking"
+        },
+        "AutoBlockOnHighRisk": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically block IPs with high parameter jacking risk"
+        },
+        "AutoBlockDuration": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$|^\\d+\\.\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "24:00:00",
+          "description": "Duration for automatic parameter jacking blocks"
+        },
+        "SecurityAlertEmail": {
+          "type": "string",
+          "format": "email",
+          "description": "Email address for security alerts"
+        },
+        "ProtectedParameters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/protectedParameter"
+          },
+          "description": "Protected parameter configurations"
+        },
+        "UserContext": {
+          "$ref": "#/definitions/userContextOptions"
+        }
+      }
+    },
+    "protectedParameter": {
+      "type": "object",
+      "required": ["Name"],
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100,
+          "description": "Parameter name to protect"
+        },
+        "Type": {
+          "type": "string",
+          "enum": ["UserContext", "PathValidation", "Custom"],
+          "default": "UserContext",
+          "description": "Parameter type for validation"
+        },
+        "Pattern": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Regular expression pattern for validation"
+        },
+        "RequireOwnership": {
+          "type": "boolean",
+          "default": true,
+          "description": "Require user ownership validation"
+        },
+        "AllowAdminOverride": {
+          "type": "boolean",
+          "default": true,
+          "description": "Allow administrative override"
+        },
+        "CustomValidatorType": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "Custom validation logic type"
+        }
+      }
+    },
+    "userContextOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableUserContextValidation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable user context validation"
+        },
+        "UserIdClaim": {
+          "type": "string",
+          "default": "sub",
+          "description": "Claim type for user ID"
+        },
+        "RoleClaim": {
+          "type": "string",
+          "default": "role",
+          "description": "Claim type for user roles"
+        },
+        "AdminRoles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": ["admin", "security"],
+          "description": "Administrative role names"
+        }
+      }
+    },
+    "patternOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnablePatternMatching": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable pattern matching functionality"
+        },
+        "PatternDirectory": {
+          "type": "string",
+          "default": "patterns/",
+          "description": "Directory containing pattern JSON files"
+        },
+        "AutoReload": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic pattern reloading"
+        },
+        "ReloadInterval": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:05:00",
+          "description": "Pattern reload check interval (HH:MM:SS)"
+        },
+        "MaxPatterns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000,
+          "default": 10000,
+          "description": "Maximum number of patterns to load"
+        },
+        "CompilePatterns": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable pattern compilation for performance"
+        },
+        "MatchTimeout": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}\\.\\d{3}$",
+          "default": "00:00:00.100",
+          "description": "Pattern matching timeout per pattern (HH:MM:SS.mmm)"
+        },
+        "DefaultPatterns": {
+          "$ref": "#/definitions/defaultPatternOptions"
+        },
+        "ExternalSources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/externalPatternSource"
+          },
+          "description": "External pattern sources"
+        }
+      }
+    },
+    "defaultPatternOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "LoadOWASPTop10": {
+          "type": "boolean",
+          "default": true,
+          "description": "Load OWASP Top 10 patterns"
+        },
+        "LoadBotPatterns": {
+          "type": "boolean",
+          "default": true,
+          "description": "Load bot detection patterns"
+        },
+        "LoadSQLInjection": {
+          "type": "boolean",
+          "default": true,
+          "description": "Load SQL injection patterns"
+        },
+        "LoadXSSPatterns": {
+          "type": "boolean",
+          "default": true,
+          "description": "Load XSS patterns"
+        },
+        "LoadPathTraversal": {
+          "type": "boolean",
+          "default": true,
+          "description": "Load path traversal patterns"
+        },
+        "LoadParameterJacking": {
+          "type": "boolean",
+          "default": true,
+          "description": "Load parameter jacking patterns"
+        }
+      }
+    },
+    "externalPatternSource": {
+      "type": "object",
+      "required": ["Name", "Url"],
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Source name"
+        },
+        "Url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Source URL"
+        },
+        "Format": {
+          "type": "string",
+          "enum": ["SecurityFramework", "ModSecurity", "Snort", "YARA"],
+          "description": "Pattern format"
+        },
+        "UpdateInterval": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$|^\\d+\\.\\d{1,2}:\\d{2}:\\d{2}$",
+          "description": "Update check interval"
+        },
+        "Enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether this source is enabled"
+        },
+        "Headers": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9\\-_]+$": {"type": "string"}
+          },
+          "description": "Additional HTTP headers for requests"
+        }
+      }
+    },
+    "realTimeOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable real-time monitoring features"
+        },
+        "EnableSignalR": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable SignalR for real-time communication"
+        },
+        "EnableWebSockets": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable WebSocket support"
+        },
+        "AuthenticateConnections": {
+          "type": "boolean",
+          "default": true,
+          "description": "Require authentication for real-time connections"
+        },
+        "MaxConnectionsPerIP": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 10,
+          "description": "Maximum connections per IP address"
+        },
+        "ConnectionTimeout": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:05:00",
+          "description": "Connection timeout duration (HH:MM:SS)"
+        },
+        "SignalR": {
+          "$ref": "#/definitions/signalROptions"
+        },
+        "WebSocket": {
+          "$ref": "#/definitions/webSocketOptions"
+        },
+        "Events": {
+          "$ref": "#/definitions/eventBroadcastOptions"
+        }
+      }
+    },
+    "signalROptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableDetailedErrors": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable detailed error messages"
+        },
+        "MaxReceiveMessageSize": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 1048576,
+          "default": 32768,
+          "description": "Maximum receive message size in bytes"
+        },
+        "StreamBufferCapacity": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10,
+          "description": "Stream buffer capacity"
+        },
+        "EnableRedisBackplane": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Redis backplane for scale-out"
+        },
+        "RedisConnectionString": {
+          "type": "string",
+          "description": "Redis connection string for backplane"
+        }
+      }
+    },
+    "webSocketOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "KeepAliveInterval": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:00:30",
+          "description": "Keep-alive interval (HH:MM:SS)"
+        },
+        "ReceiveBufferSize": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 65536,
+          "default": 4096,
+          "description": "Receive buffer size in bytes"
+        },
+        "SendBufferSize": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 65536,
+          "default": 4096,
+          "description": "Send buffer size in bytes"
+        },
+        "AllowedOrigins": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "Allowed origins for WebSocket connections"
+        }
+      }
+    },
+    "eventBroadcastOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "BroadcastThreatDetection": {
+          "type": "boolean",
+          "default": true,
+          "description": "Broadcast threat detection events"
+        },
+        "BroadcastIPBlocks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Broadcast IP blocking events"
+        },
+        "BroadcastPatternMatches": {
+          "type": "boolean",
+          "default": false,
+          "description": "Broadcast pattern match events"
+        },
+        "BroadcastMetrics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Broadcast security metrics"
+        },
+        "MetricsBroadcastInterval": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:00:10",
+          "description": "Metrics broadcast interval (HH:MM:SS)"
+        }
+      }
+    },
+    "mlOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "Enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable machine learning features"
+        },
+        "ModelsDirectory": {
+          "type": "string",
+          "default": "models/",
+          "description": "Directory containing ML model files"
+        },
+        "EnableAutoTraining": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable automatic model training"
+        },
+        "TrainingInterval": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$|^\\d+\\.\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "24:00:00",
+          "description": "Model training interval"
+        },
+        "ModelTimeout": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 10000,
+          "default": 1000,
+          "description": "Model inference timeout in milliseconds"
+        },
+        "MaxConcurrentInferences": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10,
+          "description": "Maximum concurrent model inferences"
+        }
+      }
+    },
+    "notificationOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableWebhooks": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable webhook notifications"
+        },
+        "EnableEmail": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable email notifications"
+        },
+        "CriticalThreshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "default": 75,
+          "description": "Threat score threshold for critical notifications"
+        },
+        "Webhooks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/webhookConfiguration"
+          },
+          "description": "Webhook configurations"
+        },
+        "Email": {
+          "$ref": "#/definitions/emailOptions"
+        },
+        "Throttling": {
+          "$ref": "#/definitions/throttlingOptions"
+        }
+      }
+    },
+    "webhookConfiguration": {
+      "type": "object",
+      "required": ["Name", "Url"],
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Webhook name"
+        },
+        "Url": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://.*",
+          "description": "HTTPS webhook URL"
+        },
+        "Events": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["ThreatDetected", "IPBlocked", "CriticalIncident", "HighThreat", "ParameterJacking"]
+          },
+          "uniqueItems": true,
+          "description": "Events to send to this webhook"
+        },
+        "Secret": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 256,
+          "description": "Webhook secret for signature verification"
+        },
+        "Headers": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z0-9\\-_]+$": {"type": "string"}
+          },
+          "description": "Additional headers for webhook requests"
+        },
+        "Timeout": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:00:30",
+          "description": "Webhook request timeout"
+        },
+        "RetryCount": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10,
+          "default": 3,
+          "description": "Number of retry attempts"
+        },
+        "Enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether webhook is enabled"
+        }
+      }
+    },
+    "emailOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "SmtpServer": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "SMTP server hostname"
+        },
+        "SmtpPort": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 65535,
+          "default": 587,
+          "description": "SMTP server port"
+        },
+        "Username": {
+          "type": "string",
+          "maxLength": 200,
+          "description": "SMTP username"
+        },
+        "EnableSSL": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable SSL/TLS for SMTP"
+        },
+        "FromAddress": {
+          "type": "string",
+          "format": "email",
+          "description": "From email address"
+        },
+        "ToAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "email"
+          },
+          "uniqueItems": true,
+          "description": "Recipient email addresses"
+        },
+        "SubjectPrefix": {
+          "type": "string",
+          "maxLength": 50,
+          "default": "[SecurityFramework]",
+          "description": "Email subject prefix"
+        }
+      }
+    },
+    "throttlingOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableThrottling": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable notification throttling"
+        },
+        "MaxNotificationsPerHour": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 100,
+          "description": "Maximum notifications per hour"
+        },
+        "DuplicateSuppressionMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440,
+          "default": 15,
+          "description": "Duplicate suppression window in minutes"
+        }
+      }
+    },
+    "performanceOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableCaching": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable caching for improved performance"
+        },
+        "CacheExpirationMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1440,
+          "default": 60,
+          "description": "Cache expiration time in minutes"
+        },
+        "MaxConcurrentRequests": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 100000,
+          "default": 10000,
+          "description": "Maximum concurrent requests to process"
+        },
+        "EnableMetrics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable performance metrics collection"
+        },
+        "BackgroundProcessing": {
+          "$ref": "#/definitions/backgroundProcessingOptions"
+        },
+        "Database": {
+          "$ref": "#/definitions/databaseOptions"
+        },
+        "Memory": {
+          "$ref": "#/definitions/memoryOptions"
+        }
+      }
+    },
+    "backgroundProcessingOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableBackgroundTasks": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable background task processing"
+        },
+        "PersistenceInterval": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:05:00",
+          "description": "Data persistence interval (HH:MM:SS)"
+        },
+        "CleanupInterval": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$|^\\d+\\.\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "01:00:00",
+          "description": "Data cleanup interval"
+        },
+        "AnalyticsInterval": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:15:00",
+          "description": "Analytics processing interval"
+        },
+        "MaxBackgroundTasks": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10,
+          "description": "Maximum concurrent background tasks"
+        }
+      }
+    },
+    "databaseOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableConnectionPooling": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable database connection pooling"
+        },
+        "MaxPoolSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 100,
+          "description": "Maximum connection pool size"
+        },
+        "CommandTimeout": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:00:30",
+          "description": "Database command timeout"
+        },
+        "EnableWAL": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable Write-Ahead Logging for SQLite"
+        },
+        "CacheSize": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 10000,
+          "default": 1000,
+          "description": "SQLite cache size in pages"
+        },
+        "PageSize": {
+          "type": "integer",
+          "enum": [512, 1024, 2048, 4096, 8192, 16384, 32768, 65536],
+          "default": 4096,
+          "description": "SQLite page size in bytes"
+        }
+      }
+    },
+    "memoryOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableObjectPooling": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable object pooling for performance"
+        },
+        "MaxObjectsPerPool": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 10000,
+          "default": 1000,
+          "description": "Maximum objects per pool"
+        },
+        "GCSettings": {
+          "type": "object",
+          "properties": {
+            "LatencyMode": {
+              "type": "string",
+              "enum": ["Batch", "Interactive", "LowLatency", "SustainedLowLatency"],
+              "default": "Interactive"
+            },
+            "EnableConcurrentGC": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        }
+      }
+    },
+    "externalBlocklistOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableSpamhaus": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Spamhaus blocklist integration"
+        },
+        "EnableEmergingThreats": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable Emerging Threats blocklist integration"
+        },
+        "CustomSources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/customBlocklistSource"
+          },
+          "description": "Custom blocklist sources"
+        }
+      }
+    },
+    "customBlocklistSource": {
+      "type": "object",
+      "required": ["Name", "Url"],
+      "additionalProperties": false,
+      "properties": {
+        "Name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Source name"
+        },
+        "Url": {
+          "type": "string",
+          "format": "uri",
+          "description": "Blocklist URL"
+        },
+        "Format": {
+          "type": "string",
+          "enum": ["PlainText", "JSON", "CSV"],
+          "default": "PlainText",
+          "description": "Blocklist format"
+        },
+        "UpdateInterval": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$|^\\d+\\.\\d{1,2}:\\d{2}:\\d{2}$",
+          "description": "Update check interval"
+        }
+      }
+    },
+    "rateLimitOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "EnableRateLimit": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable rate limiting"
+        },
+        "RequestsPerMinute": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000,
+          "default": 300,
+          "description": "Requests per minute limit"
+        },
+        "BurstSize": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000,
+          "default": 50,
+          "description": "Burst size for rate limiting"
+        },
+        "WindowSize": {
+          "type": "string",
+          "pattern": "^\\d{1,2}:\\d{2}:\\d{2}$",
+          "default": "00:01:00",
+          "description": "Rate limiting window size (HH:MM:SS)"
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "SecurityFramework": {
+        "EnableInMemoryStorage": true,
+        "EnableSQLitePersistence": true,
+        "SQLiteConnectionString": "Data Source=security.db;Cache=Shared;",
+        "DefaultThreatThreshold": 50,
+        "IPSecurity": {
+          "EnableBlocklist": true,
+          "AutoBlockEnabled": true,
+          "AutoBlockThreshold": 75
+        },
+        "ParameterSecurity": {
+          "EnableParameterJackingDetection": true,
+          "DetectIDManipulation": true
+        },
+        "Patterns": {
+          "EnablePatternMatching": true,
+          "PatternDirectory": "patterns/"
+        }
+      }
+    }
+  ]
+}
